@@ -1,6 +1,98 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 9376:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.doesPRNeedTests = void 0;
+const octokitClient_1 = __nccwpck_require__(7944);
+const core_1 = __nccwpck_require__(8686);
+const filesPatterns = new RegExp((0, core_1.getInput)("sourceFilePattern"));
+const doesPRNeedTests = (context) => {
+    if (context.payload.pull_request) {
+        return octokitClient_1.github.rest.pulls
+            .listFiles({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.payload.pull_request.number,
+        })
+            .then(({ data: files }) => {
+            return files.some((file) => filesPatterns.test(file.filename));
+        })
+            .catch(console.log);
+    }
+};
+exports.doesPRNeedTests = doesPRNeedTests;
+
+
+/***/ }),
+
+/***/ 7245:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBotReaction = void 0;
+const octokitClient_1 = __nccwpck_require__(7944);
+const getBotReaction = (context) => {
+    if (context.payload.pull_request) {
+        octokitClient_1.github.rest.pulls
+            .listReviews({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.payload.pull_request.number,
+        })
+            .then(({ data: reviews }) => {
+            const botReview = reviews
+                .reverse()
+                .find((review) => { var _a; return ((_a = review.user) === null || _a === void 0 ? void 0 : _a.type) === "Bot"; });
+            if (!botReview) {
+                return undefined;
+            }
+            if (botReview.state === "APPROVED") {
+                return "APPROVE";
+            }
+            return "REQUEST_CHANGES";
+        });
+    }
+    return undefined;
+};
+exports.getBotReaction = getBotReaction;
+
+
+/***/ }),
+
+/***/ 6916:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.hasPRaddedTests = void 0;
+const octokitClient_1 = __nccwpck_require__(7944);
+const core_1 = __nccwpck_require__(8686);
+const testsFilesPatterns = new RegExp((0, core_1.getInput)("testFileExtensionPattern"));
+const hasPRaddedTests = (context) => {
+    if (context.payload.pull_request) {
+        return octokitClient_1.github.rest.pulls
+            .listFiles({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.payload.pull_request.number,
+        })
+            .then(({ data: files }) => files.some((file) => testsFilesPatterns.test(file.filename)))
+            .catch(console.log);
+    }
+};
+exports.hasPRaddedTests = hasPRaddedTests;
+
+
+/***/ }),
+
 /***/ 3008:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -37,35 +129,169 @@ const github = __importStar(__nccwpck_require__(7481));
 
 /***/ }),
 
-/***/ 2914:
+/***/ 4168:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isPRFixOrFeat = void 0;
+const core_1 = __nccwpck_require__(8686);
+const isPRFixOrFeat = (context) => {
+    var _a;
+    const pullRequestTitle = (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.title;
+    const pattern = new RegExp((0, core_1.getInput)("prTitlePattern"));
+    return pattern.test(pullRequestTitle);
+};
+exports.isPRFixOrFeat = isPRFixOrFeat;
+
+
+/***/ }),
+
+/***/ 7944:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.github = void 0;
+const core_1 = __nccwpck_require__(8686);
+const github_1 = __importDefault(__nccwpck_require__(7481));
+exports.github = github_1.default.getOctokit((0, core_1.getInput)("token"));
+
+
+/***/ }),
+
+/***/ 6157:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.publishReview = void 0;
+const core_1 = __nccwpck_require__(8686);
+const octokitClient_1 = __nccwpck_require__(7944);
+const POSITIVE_MESSAGES = [
+    `![clap clap](https://media.giphy.com/media/l3q2XhfQ8oCkm1Ts4/giphy.gif)`,
+    `![hackerman](https://media.giphy.com/media/3knKct3fGqxhK/giphy.gif)`,
+    `![matrix](https://media.giphy.com/media/eIm624c8nnNbiG0V3g/giphy.gif)`,
+    `![joie](https://media.giphy.com/media/rl7Q4gxngrxVC/giphy.gif)`,
+    `![content](https://media.giphy.com/media/3joOYUPuTqXPsDytNm/giphy.gif)`,
+    `![nice](https://media.giphy.com/media/BaDsH4FpMBnqdK8J0g/giphy.gif)`,
+    `![party](https://media.giphy.com/media/l3q2zbskZp2j8wniE/giphy.gif)`,
+    `![keyboard](https://media.giphy.com/media/Hcw7rjsIsHcmk/giphy.gif)`,
+    `![bravo](https://media.giphy.com/media/l9Tllo1thElT5gvVOU/giphy.gif)`,
+    `![harry potter](https://media.giphy.com/media/Swx36wwSsU49HAnIhC/giphy.gif)`,
+    `![goodenough](https://media.tenor.com/E7pG0xll1dUAAAAC/david-goodenough-joueur-du-grenier.gif)`,
+];
+const TEST_THIS_PLEASE = [
+    `![radar](https://media.giphy.com/media/8TL7DBsPtEXqo/giphy.gif)`,
+    `![police](https://media.giphy.com/media/81xwEHX23zhvy/giphy.gif)`,
+    `![you da best](https://media.giphy.com/media/12vJgj7zMN3jPy/giphy.gif)`,
+    `![panda](https://media.giphy.com/media/EtB1yylKGGAUg/giphy.gif)`,
+    `![bucher](https://media.giphy.com/media/bZHv7NWtiakmI/giphy.gif)`,
+    `![matinal](https://media.giphy.com/media/LiuomYS6ojKrm/giphy.gif)`,
+    `![what](https://media.giphy.com/media/Ro5fB5rRvkICI/giphy.gif)`,
+    `![no](https://media.giphy.com/media/12UqNaDkfpo520/giphy.gif)`,
+    `![what have I done](https://media.giphy.com/media/10cvJCkgoH4AEM/giphy.gif)`,
+    `![where are the tests](https://media.giphy.com/media/120kDB2lOrYnV6/giphy.gif)`,
+    `![on en a gros](https://media.giphy.com/media/zrCSvFfl2fP7W/giphy.gif)`,
+    `![leodagan](https://media.giphy.com/media/elzt03Q2Hg568/giphy.gif)`,
+];
+const EXPLAIN_TEXT = `
+> It seems that you are doing a feature or a fix pull request, you need to add some tests (E2E, integration or unit) !
+`;
+const INTRO_TEXT = `
+:robot: Flo du BOT is watching over Pull Request
+`;
+const pickRandom = (array) => array[Math.floor(Math.random() * array.length)];
+const publishReview = (context, status) => {
+    var _a;
+    let event = status;
+    let message = INTRO_TEXT;
+    message += pickRandom(status === "REQUEST_CHANGES" ? TEST_THIS_PLEASE : POSITIVE_MESSAGES);
+    if (status === "REQUEST_CHANGES") {
+        message += EXPLAIN_TEXT;
+    }
+    (0, core_1.debug)(`Publishing message: ${message}`);
+    if (status === "REQUEST_CHANGES" && (0, core_1.getInput)("reviewEvent") === "COMMENT") {
+        event = "COMMENT";
+    }
+    if (context.payload.pull_request) {
+        octokitClient_1.github.rest.pulls.createReview({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number,
+            body: message,
+            event,
+        });
+    }
+};
+exports.publishReview = publishReview;
+
+
+/***/ }),
+
+/***/ 2914:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(8686);
-const run = (context) => {
-    var _a, _b;
+const isPRFixOrFeat_1 = __nccwpck_require__(4168);
+const doesPRNeedTests_1 = __nccwpck_require__(9376);
+const hasPRaddedTests_1 = __nccwpck_require__(6916);
+const getBotReaction_1 = __nccwpck_require__(7245);
+const publishReview_1 = __nccwpck_require__(6157);
+const handleReview = (context, newStatus) => __awaiter(void 0, void 0, void 0, function* () {
+    const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)(context);
+    (0, core_1.debug)(`Current Bot Review is ${currentBotStatus}`);
+    if (currentBotStatus === newStatus) {
+        (0, core_1.info)("Nothing has changed on the PR sadly 🥲");
+    }
+    else {
+        (0, core_1.info)(`Status of test addition have changed, publishing new review ${newStatus}`);
+        yield (0, publishReview_1.publishReview)(context, newStatus);
+    }
+});
+const run = (context) => __awaiter(void 0, void 0, void 0, function* () {
     const { eventName } = context;
     (0, core_1.info)(`Event name: ${eventName}`);
     if (eventName !== "pull_request") {
         (0, core_1.setFailed)(`Invalid event: ${eventName}, it should be use on pull_request`);
         return;
     }
-    const pullRequestTitle = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.title;
-    (0, core_1.info)(`Pull Request title: "${pullRequestTitle}"`);
-    const regex = RegExp((0, core_1.getInput)("regexp"), (0, core_1.getInput)("flags"));
-    const helpMessage = (0, core_1.getInput)("helpMessage");
-    if (!regex.test(pullRequestTitle)) {
-        let message = `Pull Request title "${pullRequestTitle}" failed to pass match regexp - ${regex}
-`;
-        if (helpMessage) {
-            message = message.concat(helpMessage);
-        }
-        (0, core_1.setFailed)(message);
+    if (!(0, isPRFixOrFeat_1.isPRFixOrFeat)(context)) {
+        (0, core_1.info)("Pull request is not under flo-du-bot watch 😎");
+        return;
     }
-};
+    const needTests = yield (0, doesPRNeedTests_1.doesPRNeedTests)(context);
+    const prAddedTest = yield (0, hasPRaddedTests_1.hasPRaddedTests)(context);
+    (0, core_1.info)(`Does PR need test: ${needTests}`);
+    (0, core_1.info)(`Does PR add test: ${prAddedTest}`);
+    const newStatus = needTests && !prAddedTest ? "REQUEST_CHANGES" : "APPROVE";
+    (0, core_1.debug)(`New status ${newStatus}`);
+    if ((0, core_1.getInput)("reviewEvent") !== "NONE") {
+        yield handleReview(context, newStatus);
+    }
+    if (!newStatus) {
+        (0, core_1.setFailed)("Pull request need test addition or modification to be valid!");
+    }
+});
 exports.run = run;
 
 

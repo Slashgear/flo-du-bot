@@ -1,7 +1,27 @@
-import { info, setFailed, getInput } from "@actions/core";
+import { info, setFailed, debug, getInput } from "@actions/core";
 import { Context } from "@actions/github/lib/context";
+import { isPRFixOrFeat } from "./isPRFixOrFeat";
+import { doesPRNeedTests } from "./doesPRNeedTests";
+import { hasPRaddedTests } from "./hasPRaddedTests";
+import { BOT_STATUS, getBotReaction } from "./getBotReaction";
+import { publishReview } from "./publishReview";
 
-export const run = (context: Context) => {
+const handleReview = async (context: Context, newStatus: BOT_STATUS) => {
+  const currentBotStatus = await getBotReaction(context);
+
+  debug(`Current Bot Review is ${currentBotStatus}`);
+
+  if (currentBotStatus === newStatus) {
+    info("Nothing has changed on the PR sadly 🥲");
+  } else {
+    info(
+      `Status of test addition have changed, publishing new review ${newStatus}`
+    );
+    await publishReview(context, newStatus);
+  }
+};
+
+export const run = async (context: Context) => {
   const { eventName } = context;
   info(`Event name: ${eventName}`);
 
@@ -10,19 +30,26 @@ export const run = (context: Context) => {
     return;
   }
 
-  const pullRequestTitle = context?.payload?.pull_request?.title;
+  if (!isPRFixOrFeat(context)) {
+    info("Pull request is not under flo-du-bot watch 😎");
 
-  info(`Pull Request title: "${pullRequestTitle}"`);
+    return;
+  }
 
-  const regex = RegExp(getInput("regexp"), getInput("flags"));
-  const helpMessage = getInput("helpMessage");
-  if (!regex.test(pullRequestTitle)) {
-    let message = `Pull Request title "${pullRequestTitle}" failed to pass match regexp - ${regex}
-`;
-    if (helpMessage) {
-      message = message.concat(helpMessage);
-    }
+  const needTests = await doesPRNeedTests(context);
+  const prAddedTest = await hasPRaddedTests(context);
 
-    setFailed(message);
+  info(`Does PR need test: ${needTests}`);
+  info(`Does PR add test: ${prAddedTest}`);
+
+  const newStatus = needTests && !prAddedTest ? "REQUEST_CHANGES" : "APPROVE";
+  debug(`New status ${newStatus}`);
+
+  if (getInput("reviewEvent") !== "NONE") {
+    await handleReview(context, newStatus);
+  }
+
+  if (!newStatus) {
+    setFailed("Pull request need test addition or modification to be valid!");
   }
 };

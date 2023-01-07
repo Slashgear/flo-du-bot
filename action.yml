@@ -1,6 +1,26 @@
 name: "Flo Du Bot"
 description: "Github action to ensure that test are added to a project for new features or bug fixes"
 author: "Slashgear_"
+inputs:
+  reviewEvent:
+    default: "REQUEST_CHANGES"
+    required: true
+    description: "Type of event triggered by the bot in the pullRequest"
+  prTitlePattern:
+    default: "(feat|fix)"
+    required: true
+    description: "Regexp the title should match."
+  sourceFilePattern:
+    default: "src/.*.(js|ts)"
+    required: true
+    description: "Regexp of source files edition detection."
+  testFileExtensionPattern:
+    default: "(spec.js|int.js|.feature|test.js)"
+    required: true
+    description: "Regexp of modified files extensions"
+  token:
+    required: true
+    description: "Github token used to analyse Pull Request and modify status"
 runs:
   using: "node16"
   main: "dist/index.js"
