@@ -1,0 +1,9 @@
+name: "Flo Du Bot"
+description: "Github action to ensure that test are added to a project for new features or bug fixes"
+author: "Slashgear_"
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: "eye"
+  color: "purple"

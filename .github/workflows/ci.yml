@@ -1,0 +1,41 @@
+name: Continous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+          run_install: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm format-check
+        name: Check prettier format
+      - run: pnpm build
+        name: Compile Typescript output in lib
+      - run: pnpm package
+        name: Package action in single script with NCC
+      - run: pnpm test
+        name: Run unit test with Jest
+      - name: Check if dist output is up to date with sources files
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
