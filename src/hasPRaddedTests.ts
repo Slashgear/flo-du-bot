@@ -1,10 +1,10 @@
 import { github } from "./octokitClient";
 import { getInput } from "@actions/core";
-import { Context } from "@actions/github/lib/context";
+import { context } from "@actions/github";
 
-const testsFilesPatterns = new RegExp(getInput("testFileExtensionPattern"));
+export const hasPRaddedTests = () => {
+  const testsFilesPatterns = new RegExp(getInput("testFileExtensionPattern"));
 
-export const hasPRaddedTests = (context: Context) => {
   if (context.payload.pull_request) {
     return github.rest.pulls
       .listFiles({

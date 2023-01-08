@@ -1,9 +1,19 @@
 import { github } from "./octokitClient";
-import { Context } from "@actions/github/lib/context";
+import { context } from "@actions/github";
 
-export type BOT_STATUS = "APPROVE" | "REQUEST_CHANGES" | "COMMENT" | undefined;
+export type BOT_STATUS = "APPROVE" | "REQUEST_CHANGES" | "COMMENT";
 
-export const getBotReaction = (context: Context) => {
+type Status_type = {
+  [day in BOT_STATUS]: BOT_STATUS;
+};
+
+export const STATUS: Status_type = {
+  APPROVE: "APPROVE",
+  REQUEST_CHANGES: "REQUEST_CHANGES",
+  COMMENT: "COMMENT",
+};
+
+export const getBotReaction = () => {
   if (context.payload.pull_request) {
     github.rest.pulls
       .listReviews({
@@ -20,11 +30,11 @@ export const getBotReaction = (context: Context) => {
           return undefined;
         }
 
-        if (botReview.state === "APPROVED") {
-          return "APPROVE";
+        if (botReview.state === STATUS.APPROVE) {
+          return STATUS.APPROVE;
         }
 
-        return "REQUEST_CHANGES";
+        return STATUS.REQUEST_CHANGES;
       });
   }
 

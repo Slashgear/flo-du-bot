@@ -8,16 +8,17 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.doesPRNeedTests = void 0;
-const octokitClient_1 = __nccwpck_require__(7944);
 const core_1 = __nccwpck_require__(8686);
-const filesPatterns = new RegExp((0, core_1.getInput)("sourceFilePattern"));
-const doesPRNeedTests = (context) => {
-    if (context.payload.pull_request) {
+const github_1 = __nccwpck_require__(7481);
+const octokitClient_1 = __nccwpck_require__(7944);
+const doesPRNeedTests = () => {
+    const filesPatterns = new RegExp((0, core_1.getInput)("sourceFilePattern"));
+    if (github_1.context.payload.pull_request) {
         return octokitClient_1.github.rest.pulls
             .listFiles({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.payload.pull_request.number,
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            pull_number: github_1.context.payload.pull_request.number,
         })
             .then(({ data: files }) => {
             return files.some((file) => filesPatterns.test(file.filename));
@@ -36,15 +37,21 @@ exports.doesPRNeedTests = doesPRNeedTests;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBotReaction = void 0;
+exports.getBotReaction = exports.STATUS = void 0;
 const octokitClient_1 = __nccwpck_require__(7944);
-const getBotReaction = (context) => {
-    if (context.payload.pull_request) {
+const github_1 = __nccwpck_require__(7481);
+exports.STATUS = {
+    APPROVE: "APPROVE",
+    REQUEST_CHANGES: "REQUEST_CHANGES",
+    COMMENT: "COMMENT",
+};
+const getBotReaction = () => {
+    if (github_1.context.payload.pull_request) {
         octokitClient_1.github.rest.pulls
             .listReviews({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.payload.pull_request.number,
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            pull_number: github_1.context.payload.pull_request.number,
         })
             .then(({ data: reviews }) => {
             const botReview = reviews
@@ -53,10 +60,10 @@ const getBotReaction = (context) => {
             if (!botReview) {
                 return undefined;
             }
-            if (botReview.state === "APPROVED") {
-                return "APPROVE";
+            if (botReview.state === exports.STATUS.APPROVE) {
+                return exports.STATUS.APPROVE;
             }
-            return "REQUEST_CHANGES";
+            return exports.STATUS.REQUEST_CHANGES;
         });
     }
     return undefined;
@@ -75,56 +82,21 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.hasPRaddedTests = void 0;
 const octokitClient_1 = __nccwpck_require__(7944);
 const core_1 = __nccwpck_require__(8686);
-const testsFilesPatterns = new RegExp((0, core_1.getInput)("testFileExtensionPattern"));
-const hasPRaddedTests = (context) => {
-    if (context.payload.pull_request) {
+const github_1 = __nccwpck_require__(7481);
+const hasPRaddedTests = () => {
+    const testsFilesPatterns = new RegExp((0, core_1.getInput)("testFileExtensionPattern"));
+    if (github_1.context.payload.pull_request) {
         return octokitClient_1.github.rest.pulls
             .listFiles({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.payload.pull_request.number,
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            pull_number: github_1.context.payload.pull_request.number,
         })
             .then(({ data: files }) => files.some((file) => testsFilesPatterns.test(file.filename)))
             .catch(console.log);
     }
 };
 exports.hasPRaddedTests = hasPRaddedTests;
-
-
-/***/ }),
-
-/***/ 3008:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const run_1 = __nccwpck_require__(2914);
-const github = __importStar(__nccwpck_require__(7481));
-(0, run_1.run)(github.context);
 
 
 /***/ }),
@@ -137,9 +109,10 @@ const github = __importStar(__nccwpck_require__(7481));
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.isPRFixOrFeat = void 0;
 const core_1 = __nccwpck_require__(8686);
-const isPRFixOrFeat = (context) => {
+const github_1 = __nccwpck_require__(7481);
+const isPRFixOrFeat = () => {
     var _a;
-    const pullRequestTitle = (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.title;
+    const pullRequestTitle = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.title;
     const pattern = new RegExp((0, core_1.getInput)("prTitlePattern"));
     return pattern.test(pullRequestTitle);
 };
@@ -173,7 +146,9 @@ exports.github = github_1.default.getOctokit((0, core_1.getInput)("token"));
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.publishReview = void 0;
 const core_1 = __nccwpck_require__(8686);
+const github_1 = __nccwpck_require__(7481);
 const octokitClient_1 = __nccwpck_require__(7944);
+const getBotReaction_1 = __nccwpck_require__(7245);
 const POSITIVE_MESSAGES = [
     `![clap clap](https://media.giphy.com/media/l3q2XhfQ8oCkm1Ts4/giphy.gif)`,
     `![hackerman](https://media.giphy.com/media/3knKct3fGqxhK/giphy.gif)`,
@@ -208,23 +183,24 @@ const INTRO_TEXT = `
 :robot: Flo du BOT is watching over Pull Request
 `;
 const pickRandom = (array) => array[Math.floor(Math.random() * array.length)];
-const publishReview = (context, status) => {
+const publishReview = (status) => {
     var _a;
     let event = status;
     let message = INTRO_TEXT;
-    message += pickRandom(status === "REQUEST_CHANGES" ? TEST_THIS_PLEASE : POSITIVE_MESSAGES);
-    if (status === "REQUEST_CHANGES") {
+    message += pickRandom(status === getBotReaction_1.STATUS.REQUEST_CHANGES ? TEST_THIS_PLEASE : POSITIVE_MESSAGES);
+    if (status === getBotReaction_1.STATUS.REQUEST_CHANGES) {
         message += EXPLAIN_TEXT;
     }
     (0, core_1.debug)(`Publishing message: ${message}`);
-    if (status === "REQUEST_CHANGES" && (0, core_1.getInput)("reviewEvent") === "COMMENT") {
-        event = "COMMENT";
+    if (status === getBotReaction_1.STATUS.REQUEST_CHANGES &&
+        (0, core_1.getInput)("reviewEvent") === getBotReaction_1.STATUS.COMMENT) {
+        event = getBotReaction_1.STATUS.COMMENT;
     }
-    if (context.payload.pull_request) {
+    if (github_1.context.payload.pull_request) {
         octokitClient_1.github.rest.pulls.createReview({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number,
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            pull_number: (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number,
             body: message,
             event,
         });
@@ -252,41 +228,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(8686);
+const github_1 = __nccwpck_require__(7481);
 const isPRFixOrFeat_1 = __nccwpck_require__(4168);
 const doesPRNeedTests_1 = __nccwpck_require__(9376);
 const hasPRaddedTests_1 = __nccwpck_require__(6916);
 const getBotReaction_1 = __nccwpck_require__(7245);
 const publishReview_1 = __nccwpck_require__(6157);
-const handleReview = (context, newStatus) => __awaiter(void 0, void 0, void 0, function* () {
-    const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)(context);
+const handleReview = (newStatus) => __awaiter(void 0, void 0, void 0, function* () {
+    const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)();
     (0, core_1.debug)(`Current Bot Review is ${currentBotStatus}`);
     if (currentBotStatus === newStatus) {
         (0, core_1.info)("Nothing has changed on the PR sadly 🥲");
     }
     else {
         (0, core_1.info)(`Status of test addition have changed, publishing new review ${newStatus}`);
-        yield (0, publishReview_1.publishReview)(context, newStatus);
+        yield (0, publishReview_1.publishReview)(newStatus);
     }
 });
-const run = (context) => __awaiter(void 0, void 0, void 0, function* () {
-    const { eventName } = context;
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { eventName } = github_1.context;
     (0, core_1.info)(`Event name: ${eventName}`);
     if (eventName !== "pull_request") {
         (0, core_1.setFailed)(`Invalid event: ${eventName}, it should be use on pull_request`);
         return;
     }
-    if (!(0, isPRFixOrFeat_1.isPRFixOrFeat)(context)) {
+    if (!(0, isPRFixOrFeat_1.isPRFixOrFeat)()) {
         (0, core_1.info)("Pull request is not under flo-du-bot watch 😎");
         return;
     }
-    const needTests = yield (0, doesPRNeedTests_1.doesPRNeedTests)(context);
-    const prAddedTest = yield (0, hasPRaddedTests_1.hasPRaddedTests)(context);
+    const needTests = yield (0, doesPRNeedTests_1.doesPRNeedTests)();
+    const prAddedTest = yield (0, hasPRaddedTests_1.hasPRaddedTests)();
     (0, core_1.info)(`Does PR need test: ${needTests}`);
     (0, core_1.info)(`Does PR add test: ${prAddedTest}`);
-    const newStatus = needTests && !prAddedTest ? "REQUEST_CHANGES" : "APPROVE";
+    const newStatus = needTests && !prAddedTest ? getBotReaction_1.STATUS.REQUEST_CHANGES : getBotReaction_1.STATUS.REQUEST_CHANGES;
     (0, core_1.debug)(`New status ${newStatus}`);
     if ((0, core_1.getInput)("reviewEvent") !== "NONE") {
-        yield handleReview(context, newStatus);
+        yield handleReview(newStatus);
     }
     if (!newStatus) {
         (0, core_1.setFailed)("Pull request need test addition or modification to be valid!");
@@ -15484,13 +15461,19 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3008);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const run_1 = __nccwpck_require__(2914);
+(0, run_1.run)();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map

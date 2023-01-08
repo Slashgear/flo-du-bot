@@ -1,13 +1,13 @@
 import { info, setFailed, debug, getInput } from "@actions/core";
-import { Context } from "@actions/github/lib/context";
+import { context } from "@actions/github";
 import { isPRFixOrFeat } from "./isPRFixOrFeat";
 import { doesPRNeedTests } from "./doesPRNeedTests";
 import { hasPRaddedTests } from "./hasPRaddedTests";
-import { BOT_STATUS, getBotReaction } from "./getBotReaction";
+import { BOT_STATUS, getBotReaction, STATUS } from "./getBotReaction";
 import { publishReview } from "./publishReview";
 
-const handleReview = async (context: Context, newStatus: BOT_STATUS) => {
-  const currentBotStatus = await getBotReaction(context);
+const handleReview = async (newStatus?: BOT_STATUS) => {
+  const currentBotStatus = await getBotReaction();
 
   debug(`Current Bot Review is ${currentBotStatus}`);
 
@@ -17,11 +17,11 @@ const handleReview = async (context: Context, newStatus: BOT_STATUS) => {
     info(
       `Status of test addition have changed, publishing new review ${newStatus}`
     );
-    await publishReview(context, newStatus);
+    await publishReview(newStatus);
   }
 };
 
-export const run = async (context: Context) => {
+export const run = async () => {
   const { eventName } = context;
   info(`Event name: ${eventName}`);
 
@@ -30,23 +30,24 @@ export const run = async (context: Context) => {
     return;
   }
 
-  if (!isPRFixOrFeat(context)) {
+  if (!isPRFixOrFeat()) {
     info("Pull request is not under flo-du-bot watch 😎");
 
     return;
   }
 
-  const needTests = await doesPRNeedTests(context);
-  const prAddedTest = await hasPRaddedTests(context);
+  const needTests = await doesPRNeedTests();
+  const prAddedTest = await hasPRaddedTests();
 
   info(`Does PR need test: ${needTests}`);
   info(`Does PR add test: ${prAddedTest}`);
 
-  const newStatus = needTests && !prAddedTest ? "REQUEST_CHANGES" : "APPROVE";
+  const newStatus =
+    needTests && !prAddedTest ? STATUS.REQUEST_CHANGES : STATUS.REQUEST_CHANGES;
   debug(`New status ${newStatus}`);
 
   if (getInput("reviewEvent") !== "NONE") {
-    await handleReview(context, newStatus);
+    await handleReview(newStatus as BOT_STATUS);
   }
 
   if (!newStatus) {

@@ -1,7 +1,7 @@
-import { Context } from "@actions/github/lib/context";
 import { debug, getInput } from "@actions/core";
+import { context } from "@actions/github";
 import { github } from "./octokitClient";
-import { BOT_STATUS } from "./getBotReaction";
+import { BOT_STATUS, STATUS } from "./getBotReaction";
 
 const POSITIVE_MESSAGES = [
   `![clap clap](https://media.giphy.com/media/l3q2XhfQ8oCkm1Ts4/giphy.gif)`,
@@ -43,21 +43,24 @@ const INTRO_TEXT = `
 const pickRandom = (array: string[]) =>
   array[Math.floor(Math.random() * array.length)];
 
-export const publishReview = (context: Context, status: BOT_STATUS) => {
+export const publishReview = (status: BOT_STATUS) => {
   let event = status;
   let message = INTRO_TEXT;
   message += pickRandom(
-    status === "REQUEST_CHANGES" ? TEST_THIS_PLEASE : POSITIVE_MESSAGES
+    status === STATUS.REQUEST_CHANGES ? TEST_THIS_PLEASE : POSITIVE_MESSAGES
   );
 
-  if (status === "REQUEST_CHANGES") {
+  if (status === STATUS.REQUEST_CHANGES) {
     message += EXPLAIN_TEXT;
   }
 
   debug(`Publishing message: ${message}`);
 
-  if (status === "REQUEST_CHANGES" && getInput("reviewEvent") === "COMMENT") {
-    event = "COMMENT";
+  if (
+    status === STATUS.REQUEST_CHANGES &&
+    getInput("reviewEvent") === STATUS.COMMENT
+  ) {
+    event = STATUS.COMMENT;
   }
 
   if (context.payload.pull_request) {

@@ -1,10 +1,10 @@
-import { Context } from "@actions/github/lib/context";
-import { github } from "./octokitClient";
 import { getInput } from "@actions/core";
+import { context } from "@actions/github";
 
-const filesPatterns = new RegExp(getInput("sourceFilePattern"));
+import { github } from "./octokitClient";
+export const doesPRNeedTests = () => {
+  const filesPatterns = new RegExp(getInput("sourceFilePattern"));
 
-export const doesPRNeedTests = (context: Context) => {
   if (context.payload.pull_request) {
     return github.rest.pulls
       .listFiles({
