@@ -47,7 +47,7 @@ exports.STATUS = {
 };
 const getBotReaction = () => {
     if (github_1.context.payload.pull_request) {
-        octokitClient_1.github.rest.pulls
+        return octokitClient_1.github.rest.pulls
             .listReviews({
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,

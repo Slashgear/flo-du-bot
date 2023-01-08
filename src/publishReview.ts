@@ -43,7 +43,7 @@ const INTRO_TEXT = `
 const pickRandom = (array: string[]) =>
   array[Math.floor(Math.random() * array.length)];
 
-export const publishReview = (status: BOT_STATUS) => {
+export const publishReview = (status?: BOT_STATUS) => {
   let event = status;
   let message = INTRO_TEXT;
   message += pickRandom(

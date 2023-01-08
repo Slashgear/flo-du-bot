@@ -15,7 +15,7 @@ export const STATUS: Status_type = {
 
 export const getBotReaction = () => {
   if (context.payload.pull_request) {
-    github.rest.pulls
+    return github.rest.pulls
       .listReviews({
         owner: context.repo.owner,
         repo: context.repo.repo,
