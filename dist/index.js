@@ -122,18 +122,15 @@ exports.isPRFixOrFeat = isPRFixOrFeat;
 /***/ }),
 
 /***/ 7944:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.github = void 0;
 const core_1 = __nccwpck_require__(8686);
-const github_1 = __importDefault(__nccwpck_require__(7481));
-exports.github = github_1.default.getOctokit((0, core_1.getInput)("token"));
+const github_1 = __nccwpck_require__(7481);
+exports.github = (0, github_1.getOctokit)((0, core_1.getInput)("token"));
 
 
 /***/ }),
