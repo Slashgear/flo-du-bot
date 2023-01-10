@@ -34,3 +34,5 @@ jobs:
         name: Run unit test with Jest
       - name: Run E2E action
         uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
