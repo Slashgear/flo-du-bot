@@ -32,3 +32,5 @@ jobs:
         name: Package action in single script with NCC
       - run: pnpm test -- --ci --colors
         name: Run unit test with Jest
+      - name: Run E2E action
+        uses: ./
