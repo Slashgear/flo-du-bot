@@ -33,6 +33,7 @@ jobs:
       - run: pnpm test -- --ci --colors
         name: Run unit test with Jest
       - name: Run E2E action
+        if: github.event_name == 'pull_request'
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
