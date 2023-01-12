@@ -3,8 +3,8 @@ import { context } from "@actions/github";
 import { isPRFixOrFeat } from "./isPRFixOrFeat";
 import { doesPRNeedTests } from "./doesPRNeedTests";
 import { hasPRaddedTests } from "./hasPRaddedTests";
-import { BOT_STATUS, getBotReaction, STATUS } from "./getBotReaction";
-import {handleReview} from "./handleReview";
+import { BOT_STATUS, STATUS } from "./getBotReaction";
+import { handleReview } from "./handleReview";
 
 export const run = async () => {
   const { eventName } = context;
