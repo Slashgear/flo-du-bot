@@ -37,3 +37,4 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          testFileExtensionPattern: "(spec.js|int.js|.feature|test)"
