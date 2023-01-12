@@ -73,6 +73,41 @@ exports.getBotReaction = getBotReaction;
 
 /***/ }),
 
+/***/ 6475:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handleReview = void 0;
+const getBotReaction_1 = __nccwpck_require__(7245);
+const core_1 = __nccwpck_require__(8686);
+const publishReview_1 = __nccwpck_require__(6157);
+const handleReview = (newStatus) => __awaiter(void 0, void 0, void 0, function* () {
+    const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)();
+    (0, core_1.debug)(`Current Bot Review is ${currentBotStatus}`);
+    if (currentBotStatus === newStatus) {
+        (0, core_1.info)("Nothing has changed on the PR sadly 🥲");
+    }
+    else {
+        (0, core_1.info)(`Status of test addition have changed, publishing new review ${newStatus}`);
+        yield (0, publishReview_1.publishReview)(newStatus);
+    }
+});
+exports.handleReview = handleReview;
+
+
+/***/ }),
+
 /***/ 6916:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -230,18 +265,7 @@ const isPRFixOrFeat_1 = __nccwpck_require__(4168);
 const doesPRNeedTests_1 = __nccwpck_require__(9376);
 const hasPRaddedTests_1 = __nccwpck_require__(6916);
 const getBotReaction_1 = __nccwpck_require__(7245);
-const publishReview_1 = __nccwpck_require__(6157);
-const handleReview = (newStatus) => __awaiter(void 0, void 0, void 0, function* () {
-    const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)();
-    (0, core_1.debug)(`Current Bot Review is ${currentBotStatus}`);
-    if (currentBotStatus === newStatus) {
-        (0, core_1.info)("Nothing has changed on the PR sadly 🥲");
-    }
-    else {
-        (0, core_1.info)(`Status of test addition have changed, publishing new review ${newStatus}`);
-        yield (0, publishReview_1.publishReview)(newStatus);
-    }
-});
+const handleReview_1 = __nccwpck_require__(6475);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const { eventName } = github_1.context;
     (0, core_1.info)(`Event name: ${eventName}`);
@@ -257,10 +281,10 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const prAddedTest = yield (0, hasPRaddedTests_1.hasPRaddedTests)();
     (0, core_1.info)(`Does PR need test: ${needTests}`);
     (0, core_1.info)(`Does PR add test: ${prAddedTest}`);
-    const newStatus = needTests && !prAddedTest ? getBotReaction_1.STATUS.REQUEST_CHANGES : getBotReaction_1.STATUS.REQUEST_CHANGES;
+    const newStatus = needTests && !prAddedTest ? getBotReaction_1.STATUS.REQUEST_CHANGES : getBotReaction_1.STATUS.APPROVE;
     (0, core_1.debug)(`New status ${newStatus}`);
     if ((0, core_1.getInput)("reviewEvent") !== "NONE") {
-        yield handleReview(newStatus);
+        yield (0, handleReview_1.handleReview)(newStatus);
     }
     if (!newStatus) {
         (0, core_1.setFailed)("Pull request need test addition or modification to be valid!");

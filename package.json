@@ -1,6 +1,6 @@
 {
   "name": "flo-du-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Github action to ensure that test are added to a project for new features or bug fixes",
   "repository": "git@github.com:Slashgear/action-check-pr-title.git",
   "author": "Slashgear <antoine395.caron@gmail.com>",
