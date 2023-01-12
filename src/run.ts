@@ -4,22 +4,7 @@ import { isPRFixOrFeat } from "./isPRFixOrFeat";
 import { doesPRNeedTests } from "./doesPRNeedTests";
 import { hasPRaddedTests } from "./hasPRaddedTests";
 import { BOT_STATUS, getBotReaction, STATUS } from "./getBotReaction";
-import { publishReview } from "./publishReview";
-
-const handleReview = async (newStatus?: BOT_STATUS) => {
-  const currentBotStatus = await getBotReaction();
-
-  debug(`Current Bot Review is ${currentBotStatus}`);
-
-  if (currentBotStatus === newStatus) {
-    info("Nothing has changed on the PR sadly 🥲");
-  } else {
-    info(
-      `Status of test addition have changed, publishing new review ${newStatus}`
-    );
-    await publishReview(newStatus);
-  }
-};
+import {handleReview} from "./handleReview";
 
 export const run = async () => {
   const { eventName } = context;
@@ -43,7 +28,7 @@ export const run = async () => {
   info(`Does PR add test: ${prAddedTest}`);
 
   const newStatus =
-    needTests && !prAddedTest ? STATUS.REQUEST_CHANGES : STATUS.REQUEST_CHANGES;
+    needTests && !prAddedTest ? STATUS.REQUEST_CHANGES : STATUS.APPROVE;
   debug(`New status ${newStatus}`);
 
   if (getInput("reviewEvent") !== "NONE") {
