@@ -55,7 +55,7 @@ steps:
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/Slashgear/action-check-pr-title/issues).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/Slashgear/flo-du-bot/issues).
 
 ## Show your support
 
