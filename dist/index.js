@@ -60,7 +60,7 @@ const getBotReaction = () => {
             if (!botReview) {
                 return undefined;
             }
-            if (botReview.state === exports.STATUS.APPROVE) {
+            if (botReview.state === "APPROVED") {
                 return exports.STATUS.APPROVE;
             }
             return exports.STATUS.REQUEST_CHANGES;
@@ -94,7 +94,7 @@ const core_1 = __nccwpck_require__(8686);
 const publishReview_1 = __nccwpck_require__(6157);
 const handleReview = (newStatus) => __awaiter(void 0, void 0, void 0, function* () {
     const currentBotStatus = yield (0, getBotReaction_1.getBotReaction)();
-    (0, core_1.debug)(`Current Bot Review is ${currentBotStatus}`);
+    (0, core_1.info)(`Current Bot Review is ${currentBotStatus}`);
     if (currentBotStatus === newStatus) {
         (0, core_1.info)("Nothing has changed on the PR sadly 🥲");
     }
