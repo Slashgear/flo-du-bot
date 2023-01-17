@@ -33,7 +33,11 @@ export const getBotReaction = () => {
           return undefined;
         }
 
-        return botReview.state;
+        if (botReview.state === "APPROVED") {
+          return STATUS.APPROVE;
+        }
+
+        return STATUS.REQUEST_CHANGES;
       });
   }
 
