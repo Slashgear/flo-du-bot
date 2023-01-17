@@ -5,7 +5,7 @@ import { publishReview } from "./publishReview";
 export const handleReview = async (newStatus?: BOT_STATUS) => {
   const currentBotStatus = await getBotReaction();
 
-  debug(`Current Bot Review is ${currentBotStatus}`);
+  info(`Current Bot Review is ${currentBotStatus}`);
 
   if (currentBotStatus === newStatus) {
     info("Nothing has changed on the PR sadly 🥲");
