@@ -33,7 +33,7 @@ export const getBotReaction = () => {
           return undefined;
         }
 
-        return botReview;
+        return botReview.state;
       });
   }
 
