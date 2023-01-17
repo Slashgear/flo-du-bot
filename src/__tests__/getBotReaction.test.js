@@ -32,7 +32,7 @@ describe("getBotReaction", () => {
               user: {
                 type: "Bot",
               },
-              state: "APPROVE",
+              state: "APPROVED",
             },
           ],
         }),
