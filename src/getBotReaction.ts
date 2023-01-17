@@ -27,8 +27,6 @@ export const getBotReaction = () => {
           .reverse()
           .find((review) => review.user?.type === "Bot");
 
-        info(`Api bot review status ${botReview}`);
-
         if (!botReview) {
           return undefined;
         }
