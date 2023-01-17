@@ -1,5 +1,5 @@
 import { BOT_STATUS, getBotReaction } from "./getBotReaction";
-import { debug, info } from "@actions/core";
+import { info } from "@actions/core";
 import { publishReview } from "./publishReview";
 
 export const handleReview = async (newStatus?: BOT_STATUS) => {

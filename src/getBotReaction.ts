@@ -1,5 +1,6 @@
 import { github } from "./octokitClient";
 import { context } from "@actions/github";
+import { info } from "@actions/core";
 
 export type BOT_STATUS = "APPROVE" | "REQUEST_CHANGES" | "COMMENT";
 
@@ -26,15 +27,13 @@ export const getBotReaction = () => {
           .reverse()
           .find((review) => review.user?.type === "Bot");
 
+        info(`Api bot review status ${botReview}`);
+
         if (!botReview) {
           return undefined;
         }
 
-        if (botReview.state === STATUS.APPROVE) {
-          return STATUS.APPROVE;
-        }
-
-        return STATUS.REQUEST_CHANGES;
+        return botReview;
       });
   }
 
