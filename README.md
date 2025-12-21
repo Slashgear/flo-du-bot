@@ -26,7 +26,7 @@ As we presented in the article in french ["How not to throw away a frontend appl
 Also explained in this video conference in french.
 [![youtube video screenshot](https://img.youtube.com/vi/t36UqNSmybM/0.jpg)](https://www.youtube.com/watch?v=t36UqNSmybM)
 
-With my colleague [Mickaël Alves](https://github.com/CruuzAzul), we took advantage of an R&D day to implement the rule _"Always add/modify tests when we make a fix or develop a new feature"_ that Florent was making sure we respected but with a Github action.
+With my colleague [Mickaël Alves](https://github.com/mickaelalvs), we took advantage of an R&D day to implement the rule _"Always add/modify tests when we make a fix or develop a new feature"_ that Florent was making sure we respected but with a Github action.
 This is why we named the project `flo-du-bot`, linked to the name of the person who inspired this idea.
 
 ## Usage
